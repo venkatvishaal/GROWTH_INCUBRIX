@@ -1,0 +1,72 @@
+[
+  {
+    "mode": "normal",
+    "run_start": "2026-09-04T17:56:18.219506",
+    "channels_found": 2360,
+    "channels_checked": 2360,
+    "qualified": 100,
+    "rejected": 557,
+    "duplicates_removed": 5,
+    "by_country": {
+      "US": 55,
+      "GB": 18,
+      "CA": 8,
+      "AU": 8,
+      "IE": 1,
+      "NZ": 1,
+      "SG": 9
+    },
+    "run_end": "2026-09-04T18:06:43.002379",
+    "quota_used": 6106,
+    "quota_summary": {
+      "budget": 8000,
+      "used": 6106,
+      "remaining": 1894,
+      "calls": {
+        "search.list": 50,
+        "channels.list": 50,
+        "playlistItems.list": 657,
+        "videos.list": 399
+      }
+    },
+    "total_leads_saved": 100
+  },
+  {
+    "mode": "normal",
+    "run_start": "2026-09-04T18:10:10.187039",
+    "channels_found": 1432,
+    "channels_checked": 1432,
+    "qualified": 29,
+    "rejected": 307,
+    "duplicates_removed": 30,
+    "by_country": {
+      "US": 25,
+      "CA": 1,
+      "GB": 3
+    },
+    "run_end": "2026-09-04T18:19:03.573186",
+    "quota_used": 3467,
+    "quota_summary": {
+      "budget": 3500,
+      "used": 3467,
+      "remaining": 33,
+      "calls": {
+        "search.list": 29,
+        "channels.list": 29,
+        "playlistItems.list": 336,
+        "videos.list": 202
+      }
+    },
+    "total_leads_saved": 129
+  },
+  {
+    "total": 129,
+    "refreshed": 129,
+    "still_qualified": 107,
+    "newly_disqualified": 22,
+    "contact_updated": 58,
+    "quota_used": 132,
+    "run_end": "2026-09-04T18:23:45.547052",
+    "mode": "refresh"
+  }
+]
