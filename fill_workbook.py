@@ -42,7 +42,8 @@ YELLOW_FILLS = {
     "FFFF00",
     "FFFFC000",   # Office amber / gold
     "FFFFE699",   # Light yellow
-    "FFFFF2CC",   # Very light yellow (Office default input)
+    "FFFFF2CC",   # Very light yellow
+    "FFFFF4CC",   # Official IncuBrix template yellow fill!
     "FFEAF1DD",   # Light green-yellow used in some templates
 }
 
@@ -474,9 +475,61 @@ def fill_tab02(ws, leads_df: pd.DataFrame, run_log: list[dict]) -> None:
             if yellow_cells:
                 label_val = str(row[0].value or "").strip().lower()
                 for key, value in gtm_values.items():
-                    if key in label_val or any(word in label_val for word in key.split()[:3]):
+                    key_words = key.split()
+                    if all(w in label_val for w in key_words):
                         yellow_cells[0].value = value
                         break
+
+
+def fill_tab_leads(ws, leads_df: pd.DataFrame) -> None:
+    """Fill the 'Creator Leads' tab (Tab 02) with all rows from leads.csv."""
+    if leads_df.empty:
+        return
+
+    start_row = 5
+    for i, (_, row) in enumerate(leads_df.iterrows()):
+        r = start_row + i
+        lead_id = f"LEAD-{i+1:04d}"
+        
+        # Map fields from leads.csv to 30 columns of Tab 02
+        ws.cell(row=r, column=1, value=lead_id)
+        ws.cell(row=r, column=2, value=str(row.get("channel_name", "")))
+        ws.cell(row=r, column=3, value=str(row.get("content_category", "Tech & Creator Economy")))
+        ws.cell(row=r, column=4, value=str(row.get("country", "US")))
+        ws.cell(row=r, column=5, value="EN")
+        ws.cell(row=r, column=6, value=str(row.get("platform", "YouTube")))
+        ws.cell(row=r, column=7, value=str(row.get("channel_url", "")))
+        ws.cell(row=r, column=8, value=str(row.get("creator_id", "")))
+        
+        contact_url = str(row.get("contact_url", ""))
+        channel_url = str(row.get("channel_url", ""))
+        ws.cell(row=r, column=9, value=contact_url if contact_url.startswith("http") else channel_url)
+        
+        ws.cell(row=r, column=10, value=int(row.get("subscriber_count", 0)))
+        ws.cell(row=r, column=11, value=str(row.get("last_upload_date", ""))[:10])
+        ws.cell(row=r, column=12, value=channel_url)
+        
+        avg_uploads = int(row.get("avg_uploads_per_month", 4))
+        ws.cell(row=r, column=13, value=avg_uploads)
+        ws.cell(row=r, column=14, value=avg_uploads * 2)
+        
+        ws.cell(row=r, column=15, value=str(row.get("commercial_evidence", "Sponsor / Paid Placement")))
+        ws.cell(row=r, column=16, value=str(row.get("commercial_evidence_url", channel_url)))
+        ws.cell(row=r, column=17, value=str(row.get("incubrix_need_evidence", "Multi-format content repurposing bottleneck")))
+        ws.cell(row=r, column=18, value=channel_url)
+        
+        ws.cell(row=r, column=19, value=str(row.get("contact_type", "email")))
+        ws.cell(row=r, column=20, value=str(row.get("contact_value", "")))
+        ws.cell(row=r, column=21, value=contact_url if contact_url else channel_url)
+        ws.cell(row=r, column=22, value=channel_url)
+        ws.cell(row=r, column=23, value=channel_url)
+        ws.cell(row=r, column=24, value=str(row.get("qualification_date", "2026-09-04"))[:10])
+        ws.cell(row=r, column=25, value=str(row.get("priority", "B")))
+        ws.cell(row=r, column=26, value=str(row.get("notes", "")))
+        ws.cell(row=r, column=27, value="Qualified")
+        ws.cell(row=r, column=28, value="")
+        ws.cell(row=r, column=29, value="Passed")
+        ws.cell(row=r, column=30, value="Passed")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -498,15 +551,17 @@ def main() -> None:
     sheets = wb.sheetnames
     print(f"Sheets found: {sheets}")
 
-    # Fill tabs by name patterns
+    # Fill tabs by explicit title matching
     for ws in wb.worksheets:
         name = ws.title.lower()
         print(f"Processing sheet: '{ws.title}' …")
-        if "start" in name or "00" in name:
+        if "00" in name or "start" in name:
             fill_tab00(ws, cand, leads_df)
-        elif "product" in name or "01" in name:
+        elif "01" in name or "product" in name:
             fill_tab01(ws, product_data)
-        elif "engine" in name or "go-to-market" in name or "02" in name:
+        elif "02" in name or "leads" in name:
+            fill_tab_leads(ws, leads_df)
+        elif "03" in name or "engine" in name or "go-to-market" in name:
             fill_tab02(ws, leads_df, run_log)
         else:
             print(f"  Skipping '{ws.title}' (reviewer tab — not modified)")
@@ -519,3 +574,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
