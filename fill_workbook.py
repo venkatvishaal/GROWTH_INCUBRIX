@@ -528,7 +528,12 @@ def main() -> None:
         raise FileNotFoundError(f"Template not found: {TEMPLATE}")
 
     OUTPUT_XLSX.parent.mkdir(exist_ok=True)
-    shutil.copy2(TEMPLATE, OUTPUT_XLSX)
+    try:
+        shutil.copy2(TEMPLATE, OUTPUT_XLSX)
+    except PermissionError:
+        print(f"\n[ERROR] Permission denied: '{OUTPUT_XLSX.name}' is currently open in Microsoft Excel!")
+        print("Please close Excel and re-run: python fill_workbook.py\n")
+        return
     print(f"Copied template -> {OUTPUT_XLSX}")
 
     cand         = _load_candidate()
@@ -555,7 +560,12 @@ def main() -> None:
         else:
             print(f"  Skipping '{ws.title}' (reviewer tab — not modified)")
 
-    wb.save(OUTPUT_XLSX)
+    try:
+        wb.save(OUTPUT_XLSX)
+    except PermissionError:
+        print(f"\n[ERROR] Could not save: '{OUTPUT_XLSX.name}' is open in Microsoft Excel!")
+        print("Please close Excel and re-run: python fill_workbook.py\n")
+        return
     print(f"\nWorkbook saved -> {OUTPUT_XLSX}")
     print(f"  Leads included: {len(leads_df)}")
     print(f"  Priority A:     {int((leads_df['priority']=='A').sum()) if not leads_df.empty else 'N/A'}")
