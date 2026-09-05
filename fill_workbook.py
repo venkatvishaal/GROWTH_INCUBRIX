@@ -189,6 +189,7 @@ def fill_tab00(ws, cand: dict, leads_df: pd.DataFrame) -> None:
         "registered email":           cand.get("registered_email", ""),
         "assessment start":           cand.get("assessment_start", ""),
         "submission time":            submission_time,
+        "ai/tools used":              cand.get("ai_tools_used", ""),
         "ai tools used":              cand.get("ai_tools_used", ""),
         "repository or workflow url": cand.get("repo_url", ""),
         "product review video url":   cand.get("product_video_url", ""),
@@ -198,32 +199,20 @@ def fill_tab00(ws, cand: dict, leads_df: pd.DataFrame) -> None:
     for row in ws.iter_rows():
         for cell in row:
             if _is_yellow(cell):
-                # Look at the cell to the left for the label
-                label_cell = ws.cell(row=cell.row, column=max(1, cell.column - 1))
-                label = str(label_cell.value or "").strip().lower()
-                if label in label_to_value:
-                    cell.value = label_to_value[label]
+                # Look at column 1 for the label if column is 2
+                if cell.column == 2:
+                    label_cell = ws.cell(row=cell.row, column=1)
+                    label = str(label_cell.value or "").strip().lower()
+                    if label in label_to_value:
+                        cell.value = label_to_value[label]
 
-    # Submission checklist "Done" column — mark all 5 as done
-    # The checklist is in the right-hand area (rows 13-17 or so in the visible table)
-    # We look for cells containing "1 Completed workbook" etc. and mark adjacent Done cell
-    done_map = {
-        "completed workbook": "✓",
-        "full leads.csv":     f"✓ ({total_leads} leads)",
-        "repository":         "✓",
-        "product evidence":   "✓",
-        "demo":               "✓",
-    }
-    for row in ws.iter_rows():
-        for cell in row:
-            if cell.value and isinstance(cell.value, str):
-                cell_lower = cell.value.strip().lower()
-                for key, tick in done_map.items():
-                    if key in cell_lower:
-                        # Fill the next non-empty column cell as "Done"
-                        done_cell = ws.cell(row=cell.row, column=cell.column + 1)
-                        if done_cell.value is None or str(done_cell.value).strip() == "":
-                            done_cell.value = tick
+    # Submission checklist "Done" column (Column 6 in rows 14-18)
+    ws.cell(row=14, column=6, value="✓")
+    ws.cell(row=15, column=6, value=f"✓ ({total_leads} leads)")
+    ws.cell(row=16, column=6, value="✓")
+    ws.cell(row=17, column=6, value="✓")
+    ws.cell(row=18, column=6, value="✓")
+
 
 
 def fill_tab01(ws, product_data: dict) -> None:
